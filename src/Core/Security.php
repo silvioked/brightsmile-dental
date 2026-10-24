@@ -34,6 +34,13 @@ final class Security
      */
     public static function initSecureSession(): void
     {
+        if (!headers_sent()) {
+            header_remove('X-Powered-By');
+            header('X-Content-Type-Options: nosniff');
+            header('X-Frame-Options: DENY');
+            header('Referrer-Policy: strict-origin-when-cross-origin');
+        }
+
         if (session_status() === PHP_SESSION_NONE) {
             ini_set('session.use_only_cookies', '1');
             ini_set('session.use_strict_mode', '1');

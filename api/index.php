@@ -2,9 +2,49 @@
 declare(strict_types=1);
 
 /**
- * Vercel Serverless Front-Controller Entry Point (api/index.php).
- * Routes incoming requests on Vercel to the corresponding PHP script inside public/.
+ * Hardened Vercel Serverless Front-Controller Entry Point (api/index.php).
+ * - Enforces HTTP method whitelisting
+ * - Blocks CGI / PHP2Shell (CVE-2026-109618 / CVE-2026-109619 / CVE-2024-4577) payload patterns
+ * - Sets strict HTTP security headers and strips X-Powered-By
+ * - Routes strictly to whitelisted PHP scripts inside public/
  */
+
+// 1. Hide PHP version disclosure & set security headers
+if (!headers_sent()) {
+    header_remove('X-Powered-By');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: DENY');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+}
+
+// 2. Enforce strict HTTP method whitelist
+$method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+if (!in_array($method, ['GET', 'POST', 'HEAD'], true)) {
+    http_response_code(405);
+    exit('405 Method Not Allowed');
+}
+
+// 3. Block CGI / PHP2Shell / INI injection vectors in raw URI or query string
+$rawRequest = rawurldecode(($method === 'POST' ? '' : '') . ($_SERVER['REQUEST_URI'] ?? '') . '&' . ($_SERVER['QUERY_STRING'] ?? ''));
+$blockedPatterns = [
+    'allow_url_include',
+    'auto_prepend_file',
+    'auto_append_file',
+    'php://input',
+    'php://filter',
+    'data://',
+    'expect://',
+    "\x00",
+    "\xAD", // Windows Best-Fit soft-hyphen CGI injection vector
+];
+foreach ($blockedPatterns as $pattern) {
+    if (stripos($rawRequest, $pattern) !== false) {
+        http_response_code(403);
+        exit('403 Forbidden');
+    }
+}
+
 $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $uriPath = '/' . ltrim($uriPath, '/');
 
@@ -18,7 +58,7 @@ if ($uriPath === '/' || $uriPath === '/index.php') {
     $uriPath = '/login.php';
 }
 
-// Whitelist of valid PHP entry points inside public/
+// 4. Strict whitelist of valid PHP entry points inside public/
 $allowedRoutes = [
     '/login.php'                     => __DIR__ . '/../public/login.php',
     '/register.php'                  => __DIR__ . '/../public/register.php',
@@ -31,7 +71,6 @@ $allowedRoutes = [
 ];
 
 if (isset($allowedRoutes[$uriPath]) && is_file($allowedRoutes[$uriPath])) {
-    // Update SCRIPT_NAME so relative path helpers know the active route
     $_SERVER['SCRIPT_NAME'] = $uriPath;
     chdir(dirname($allowedRoutes[$uriPath]));
     require $allowedRoutes[$uriPath];
