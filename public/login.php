@@ -16,12 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email    = trim((string) ($_POST['email'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
 
-    $result = AuthMiddleware::attemptLogin($email, $password);
-    if ($result['success']) {
-        header('Location: ' . $result['redirect']);
-        exit;
+    try {
+        $result = AuthMiddleware::attemptLogin($email, $password);
+        if ($result['success']) {
+            header('Location: ' . $result['redirect']);
+            exit;
+        }
+        $error = $result['message'];
+    } catch (Throwable $e) {
+        $error = $e->getMessage();
     }
-    $error = $result['message'];
 }
 ?>
 <!DOCTYPE html>
