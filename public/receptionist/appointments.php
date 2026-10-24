@@ -96,24 +96,30 @@ $activeNav = $statusFilter === 'Pending' ? 'pending' : ($statusFilter === 'Confi
     <!-- Main Workspace Area (Scrolls independently while sidebar stays locked) -->
     <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto scroll-smooth">
         <!-- Top Workspace Header -->
-        <header class="sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-6 sm:px-8 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Front-Desk Operations & Queue</h1>
-                <p class="text-xs text-slate-500">Approve pending requests, reschedule slots, and register walk-in patients</p>
+        <header class="sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-4 flex justify-between items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <button type="button" onclick="toggleSidebar(true)" aria-label="Open menu"
+                        class="lg:hidden w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                    ☰
+                </button>
+                <div class="truncate">
+                    <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight truncate">Front-Desk Operations & Queue</h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">Approve pending requests, reschedule slots, and register walk-in patients</p>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 <span class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-3.5 py-1.5 rounded-full">
                     <span>📅</span>
                     <span><?= date('l, M j, Y') ?></span>
                 </span>
                 <a href="<?= Security::escape(Security::url('/logout.php')) ?>"
-                   class="lg:hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl">
+                   class="lg:hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl">
                     Sign Out
                 </a>
             </div>
         </header>
 
-        <main class="p-6 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main class="p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6">
             <?php if ($feedback !== null): ?>
                 <div class="p-4 rounded-2xl border flex items-center gap-3 text-sm font-medium <?= $feedback['success'] ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800' ?>">
                     <span class="text-lg"><?= $feedback['success'] ? '✓' : '⚠' ?></span>
@@ -295,7 +301,7 @@ $activeNav = $statusFilter === 'Pending' ? 'pending' : ($statusFilter === 'Confi
                             </select>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Date</label>
                                 <input type="date" name="appointment_date" value="<?= date('Y-m-d') ?>" min="<?= date('Y-m-d') ?>" required

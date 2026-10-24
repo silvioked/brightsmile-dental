@@ -4,8 +4,9 @@ declare(strict_types=1);
 use App\Core\Security;
 
 /**
- * Shared Non-Scrolling Fixed Left Sidebar Navigation for all Authenticated Portals.
- * Expects $currentUser = $_SESSION['user'] and optional $activeNav (string).
+ * Responsive Non-Scrolling Left Sidebar Navigation for all Authenticated Portals.
+ * - Desktop (lg+): Locked 100vh non-scrolling left sidebar.
+ * - Mobile/Tablet (<lg): Smooth slide-over off-canvas drawer with backdrop overlay.
  */
 $role = $currentUser['role'] ?? 'client';
 $activeNav = $activeNav ?? 'dashboard';
@@ -46,21 +47,33 @@ if ($role === 'admin') {
     ];
 }
 ?>
-<!-- Locked Non-Scrolling Left Sidebar -->
-<aside class="w-72 h-screen overflow-hidden bg-slate-950 text-slate-200 flex-shrink-0 hidden lg:flex flex-col justify-between border-r border-slate-800/80 select-none">
+<!-- Mobile Backdrop Overlay -->
+<div id="sidebarBackdrop"
+     onclick="toggleSidebar(false)"
+     class="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm hidden lg:hidden transition-opacity"></div>
+
+<!-- Responsive Non-Scrolling Left Sidebar -->
+<aside id="appSidebar"
+       class="fixed inset-y-0 left-0 z-50 w-72 h-screen overflow-hidden bg-slate-950 text-slate-200 flex-shrink-0 flex flex-col justify-between border-r border-slate-800/80 select-none transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
     <!-- Top Brand & Navigation -->
     <div class="p-6 space-y-6">
-        <!-- Clinic Brand -->
-        <div class="flex items-center gap-3 pb-5 border-b border-slate-800/80">
-            <span class="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 text-slate-950 flex items-center justify-center font-extrabold text-lg shadow-lg shadow-teal-500/20">
-                ✦
-            </span>
-            <div>
-                <span class="font-extrabold text-white text-lg tracking-tight block leading-none">BrightSmile</span>
-                <span class="inline-block mt-1.5 text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider border <?= $roleMeta['badge'] ?>">
-                    <?= Security::escape($roleMeta['label']) ?>
+        <!-- Clinic Brand + Mobile Close Button -->
+        <div class="flex items-center justify-between pb-5 border-b border-slate-800/80">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-400 to-cyan-500 text-slate-950 flex items-center justify-center font-extrabold text-lg shadow-lg shadow-teal-500/20">
+                    ✦
                 </span>
+                <div>
+                    <span class="font-extrabold text-white text-lg tracking-tight block leading-none">BrightSmile</span>
+                    <span class="inline-block mt-1.5 text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider border <?= $roleMeta['badge'] ?>">
+                        <?= Security::escape($roleMeta['label']) ?>
+                    </span>
+                </div>
             </div>
+            <button type="button" onclick="toggleSidebar(false)" aria-label="Close navigation"
+                    class="lg:hidden w-8 h-8 rounded-xl bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center border border-slate-800">
+                ✕
+            </button>
         </div>
 
         <!-- Navigation Menu -->
@@ -71,6 +84,7 @@ if ($role === 'admin') {
             <?php foreach ($navItems as $item): ?>
                 <?php $isActive = ($activeNav === $item['id']); ?>
                 <a href="<?= Security::escape($item['href']) ?>"
+                   onclick="toggleSidebar(false)"
                    class="flex items-center gap-3.5 px-4 py-2.5 rounded-2xl text-sm font-semibold transition <?= $isActive ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-lg shadow-teal-600/25' : 'text-slate-400 hover:text-white hover:bg-white/5' ?>">
                     <span class="text-base leading-none"><?= $item['icon'] ?></span>
                     <span><?= Security::escape($item['label']) ?></span>
@@ -93,7 +107,7 @@ if ($role === 'admin') {
     <!-- Bottom User Profile & Sign Out -->
     <div class="p-5 border-t border-slate-800/80 bg-slate-900/50 space-y-3">
         <div class="flex items-center gap-3">
-            <span class="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-400/30 text-teal-300 font-extrabold text-sm flex items-center justify-center">
+            <span class="w-10 h-10 rounded-2xl bg-teal-500/20 border border-teal-400/30 text-teal-300 font-extrabold text-sm flex items-center justify-center flex-shrink-0">
                 <?= Security::escape(strtoupper(substr($currentUser['name'] ?? 'U', 0, 1))) ?>
             </span>
             <div class="overflow-hidden">
@@ -108,3 +122,22 @@ if ($role === 'admin') {
         </a>
     </div>
 </aside>
+
+<script>
+    function toggleSidebar(forceOpen) {
+        const sidebar = document.getElementById('appSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (!sidebar || !backdrop) return;
+
+        const isOpen = !sidebar.classList.contains('-translate-x-full');
+        const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isOpen;
+
+        if (shouldOpen) {
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.add('hidden');
+        }
+    }
+</script>

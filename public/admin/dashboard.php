@@ -140,24 +140,30 @@ $activeNav = 'overview';
     <!-- Main Workspace Area (Scrolls independently while sidebar stays locked) -->
     <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto scroll-smooth">
         <!-- Top Workspace Header -->
-        <header class="sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-6 sm:px-8 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Executive Clinic Administration</h1>
-                <p class="text-xs text-slate-500">Analytics, procedure catalog pricing, and staff account provisioning</p>
+        <header class="sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-4 flex justify-between items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <button type="button" onclick="toggleSidebar(true)" aria-label="Open menu"
+                        class="lg:hidden w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                    ☰
+                </button>
+                <div class="truncate">
+                    <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight truncate">Executive Clinic Administration</h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">Analytics, procedure catalog pricing, and staff account provisioning</p>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 <span class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200 px-3.5 py-1.5 rounded-full">
                     <span>⚡</span>
                     <span><?= date('l, M j, Y') ?></span>
                 </span>
                 <a href="<?= Security::escape(Security::url('/logout.php')) ?>"
-                   class="lg:hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl">
+                   class="lg:hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl">
                     Sign Out
                 </a>
             </div>
         </header>
 
-        <main class="p-6 sm:p-8 max-w-7xl w-full mx-auto space-y-8">
+        <main class="p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8">
             <?php if ($feedback !== null): ?>
                 <div class="p-4 rounded-2xl border flex items-center gap-3 text-sm font-medium <?= $feedback['success'] ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800' ?>">
                     <span class="text-lg"><?= $feedback['success'] ? '✓' : '⚠' ?></span>
@@ -214,7 +220,7 @@ $activeNav = 'overview';
                         <div class="text-xs font-extrabold uppercase tracking-wider text-teal-700">+ Add Dental Procedure</div>
                         <input type="text" name="name" placeholder="Procedure Name (e.g., Panoramic Dental X-Ray)" required
                                class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <input type="number" name="duration_minutes" placeholder="Duration (mins)" min="15" step="15" required
                                    class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                             <input type="number" name="price" placeholder="Rate (PHP)" min="0" step="0.01" required
@@ -253,22 +259,22 @@ $activeNav = 'overview';
                         <?= Security::csrfField() ?>
                         <input type="hidden" name="action" value="add_staff">
                         <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-700">+ Provision Staff / Dentist Account</div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <select name="role_id" required class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold">
                                 <option value="2">🦷 Dentist</option>
                                 <option value="3">🗂 Receptionist / Staff</option>
                             </select>
                             <input type="text" name="phone" placeholder="Mobile Phone" required class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <input type="text" name="first_name" placeholder="First Name" required class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                             <input type="text" name="last_name" placeholder="Last Name" required class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <input type="email" name="email" placeholder="Email Address" required class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                             <input type="password" name="password" placeholder="Password (min 8 chars)" minlength="8" required class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <input type="text" name="license_number" placeholder="PRC License (Dentists)" class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                             <input type="text" name="specialization" placeholder="Specialization (Dentists)" class="bg-white border border-slate-200 rounded-xl px-3.5 py-2.5">
                         </div>

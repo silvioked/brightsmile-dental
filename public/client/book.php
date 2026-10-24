@@ -65,24 +65,30 @@ $activeNav = 'book';
     <!-- Main Workspace Area (Scrolls independently while sidebar stays locked) -->
     <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto scroll-smooth">
         <!-- Top Workspace Header -->
-        <header class="sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-6 sm:px-8 py-4 flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Patient Appointment Portal</h1>
-                <p class="text-xs text-slate-500">Reserve your dental procedure with real-time slot verification</p>
+        <header class="sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-4 flex justify-between items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <button type="button" onclick="toggleSidebar(true)" aria-label="Open menu"
+                        class="lg:hidden w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                    ☰
+                </button>
+                <div class="truncate">
+                    <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight truncate">Patient Appointment Portal</h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">Reserve your dental procedure with real-time slot verification</p>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                 <span class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200 px-3.5 py-1.5 rounded-full">
                     <span>📅</span>
                     <span><?= date('l, M j, Y') ?></span>
                 </span>
                 <a href="<?= Security::escape(Security::url('/logout.php')) ?>"
-                   class="lg:hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl">
+                   class="lg:hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-xl">
                     Sign Out
                 </a>
             </div>
         </header>
 
-        <main class="p-6 sm:p-8 max-w-7xl w-full mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <main class="p-4 sm:p-8 max-w-7xl w-full mx-auto grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8">
             <!-- Left Column: Booking Wizard Card -->
             <section id="book-section" class="xl:col-span-7 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200/80">
                 <div class="mb-6">
